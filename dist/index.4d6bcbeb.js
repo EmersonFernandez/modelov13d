@@ -593,9 +593,6 @@ const scene = new _three.Scene();
 const camera = new _three.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
 camera.position.set(-186.51864946972694, 103.29856636823064, -115.84244739975364); // Ajusta la posición de la cámara para estar más cerca del modelo
 camera.fog = new _three.Fog(0xe6e6e6, 5);
-// -186.51864946972694
-// 103.29856636823064
-// -115.84244739975364
 const renderer = new _three.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true; // Habilitar las sombras en el renderizador
@@ -625,7 +622,6 @@ scene.add(directionalLight);
 const textureLoader = new _three.TextureLoader();
 // Añadir suelo
 const planeGeometry = new _three.PlaneGeometry(1000, 1000);
-// const sep = textureLoader.load('assets/sep.jpg'); // Ruta de la textura
 const planeMaterial = new _three.MeshLambertMaterial({
     color: 0xe6e6e6
 });
@@ -638,6 +634,45 @@ scene.add(plane);
 textureLoader.load("./assets/vignette.jpg", function(texture) {
     scene.background = texture;
 });
+// Añadir controles
+const controls = new (0, _orbitControlsJs.OrbitControls)(camera, renderer.domElement);
+controls.update();
+// Raycaster y mouse vector
+const raycaster = new _three.Raycaster();
+const mouse = new _three.Vector2();
+// Tooltip
+const tooltip = document.createElement("div");
+tooltip.style.position = "absolute";
+tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+tooltip.style.color = "white";
+tooltip.style.padding = "5px";
+tooltip.style.borderRadius = "5px";
+tooltip.style.display = "none";
+document.body.appendChild(tooltip);
+// Función para manejar el movimiento del mouse
+function onMouseMove(event) {
+    // Convertir coordenadas del mouse a coordenadas normalizadas del dispositivo
+    mouse.x = event.clientX / window.innerWidth * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // Actualizar raycaster
+    raycaster.setFromCamera(mouse, camera);
+    // Verificar si el modelo está cargado
+    if (loadedModel) {
+        // Calcular objetos intersectados
+        const intersects = raycaster.intersectObject(loadedModel, true);
+        if (intersects.length > 0) {
+            // Mostrar tooltip
+            tooltip.style.display = "block";
+            tooltip.style.left = `${event.clientX + 10}px`;
+            tooltip.style.top = `${event.clientY + 10}px`;
+            tooltip.textContent = "Informaci\xf3n del modelo 3D de prueba v1"; // Cambia esto según tu necesidad
+        } else // Ocultar tooltip
+        tooltip.style.display = "none";
+    }
+}
+// Escuchar eventos de movimiento del mouse
+window.addEventListener("mousemove", onMouseMove);
+let loadedModel;
 // Función para cargar el HDR y el modelo FBX
 function loadScene() {
     return new Promise((resolve, reject)=>{
@@ -660,6 +695,7 @@ function loadScene() {
                     }
                 });
                 scene.add(object);
+                loadedModel = object; // Guardar referencia al modelo cargado
                 resolve(); // Resolver la promesa una vez que todo se haya cargado
             }, undefined, function(error) {
                 reject(error); // Rechazar la promesa si hay un error
@@ -669,15 +705,11 @@ function loadScene() {
         });
     });
 }
-// Añadir controles
-const controls = new (0, _orbitControlsJs.OrbitControls)(camera, renderer.domElement);
-controls.update();
 // Funciones adicionales
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
-    console.log(camera.position);
 }
 // Iniciar la carga de la escena
 loadScene().then(()=>{

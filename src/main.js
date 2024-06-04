@@ -3,17 +3,11 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-
 // Configuración inicial de la escena, cámara y renderizador
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
 camera.position.set(-186.51864946972694, 103.29856636823064, -115.84244739975364); // Ajusta la posición de la cámara para estar más cerca del modelo
-camera.fog = new THREE.Fog(0xe6e6e6,5);
-
-// -186.51864946972694
-// 103.29856636823064
-// -115.84244739975364
-
+camera.fog = new THREE.Fog(0xe6e6e6, 5);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -60,6 +54,56 @@ textureLoader.load('./assets/vignette.jpg', function (texture) {
     scene.background = texture;
 });
 
+// Añadir controles
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.update();
+
+// Raycaster y mouse vector
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+// Tooltip
+const tooltip = document.createElement('div');
+tooltip.style.position = 'absolute';
+tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+tooltip.style.color = 'white';
+tooltip.style.padding = '5px';
+tooltip.style.borderRadius = '5px';
+tooltip.style.display = 'none';
+document.body.appendChild(tooltip);
+
+// Función para manejar el movimiento del mouse
+function onMouseMove(event) {
+    // Convertir coordenadas del mouse a coordenadas normalizadas del dispositivo
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    // Actualizar raycaster
+    raycaster.setFromCamera(mouse, camera);
+
+    // Verificar si el modelo está cargado
+    if (loadedModel) {
+        // Calcular objetos intersectados
+        const intersects = raycaster.intersectObject(loadedModel, true);
+
+        if (intersects.length > 0) {
+            // Mostrar tooltip
+            tooltip.style.display = 'block';
+            tooltip.style.left = `${event.clientX + 10}px`;
+            tooltip.style.top = `${event.clientY + 10}px`;
+            tooltip.textContent = 'Información del modelo 3D de prueba v1'; // Cambia esto según tu necesidad
+        } else {
+            // Ocultar tooltip
+            tooltip.style.display = 'none';
+        }
+    }
+}
+
+// Escuchar eventos de movimiento del mouse
+window.addEventListener('mousemove', onMouseMove);
+
+let loadedModel;
+
 // Función para cargar el HDR y el modelo FBX
 function loadScene() {
     return new Promise((resolve, reject) => {
@@ -85,7 +129,7 @@ function loadScene() {
                         }
                     });
                     scene.add(object);
-
+                    loadedModel = object; // Guardar referencia al modelo cargado
                     resolve(); // Resolver la promesa una vez que todo se haya cargado
                 }, undefined, function (error) {
                     reject(error); // Rechazar la promesa si hay un error
@@ -95,10 +139,6 @@ function loadScene() {
             });
     });
 }
-
-// Añadir controles
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.update();
 
 // Funciones adicionales
 function animate() {
@@ -117,7 +157,6 @@ loadScene().then(() => {
     console.error('Error loading scene:', error);
     alert('Error loading scene. Check the console for details.');
 });
-
 
 // Función para manejar el redimensionamiento de la ventana del navegador
 function onWindowResize() {
