@@ -640,15 +640,64 @@ controls.update();
 // Raycaster y mouse vector
 const raycaster = new _three.Raycaster();
 const mouse = new _three.Vector2();
+// Title 
+const boxTitle = document.createElement("div");
+const title1 = document.createElement("p");
+const title2 = document.createElement("p");
+document.body.appendChild(boxTitle);
+boxTitle.appendChild(title1);
+boxTitle.appendChild(title2);
+boxTitle.style.position = "absolute";
+boxTitle.style.top = 0;
+boxTitle.style.left = "50%";
+boxTitle.style.transform = "translate(-50%)";
+boxTitle.style.textAlign = "center";
+boxTitle.style.color = "#ffffff";
+boxTitle.style.margin = "10px 0";
+title1.style.fontSize = "2.0rem";
+title1.style.fontWeight = "bold";
+title2.style.fontSize = "1.5rem";
+title1.style.margin = 0;
+title1.style.padding = 0;
+title2.style.margin = 0;
+title2.style.padding = 0;
+title1.textContent = "GEOTECTURAS";
+title2.textContent = "TECNOLOG\xcdA PARA LA GESTI\xd3N URBANA";
 // Tooltip
 const tooltip = document.createElement("div");
+tooltip.classList.add("div-tooltip");
 tooltip.style.position = "absolute";
-tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+tooltip.style.backgroundColor = "transparent";
 tooltip.style.color = "white";
 tooltip.style.padding = "5px";
 tooltip.style.borderRadius = "5px";
 tooltip.style.display = "none";
+tooltip.style.textAlign = "center";
+tooltip.style.top = "20px";
+tooltip.style.right = "20px";
+tooltip.style.width = "300px"; // Ancho del tooltip como porcentaje del ancho de la ventana
+tooltip.style.maxWidth = "200px"; // Ancho máximo absoluto para grandes pantallas
+tooltip.style.fontSize = "calc(10px + 0.5vw)"; // Tamaño de fuente responsivo
 document.body.appendChild(tooltip);
+const img = document.createElement("img"); // creamos elemento img
+const p = document.createElement("p"); // creamos elemento p
+p.style.fontSize = "0.99rem";
+tooltip.appendChild(img); // lo añadimos al elemento tooltip
+tooltip.appendChild(p); // lo añadimos al elemento tooltip
+// Logo
+const logo = document.createElement("img");
+const logoBackground = document.createElement("div");
+logoBackground.appendChild(logo);
+logo.src = "./assets/logo_fondoBlanco.png";
+logo.alt = "Logo";
+logoBackground.style.position = "absolute";
+logoBackground.style.bottom = "20px";
+logoBackground.style.right = "20px";
+logoBackground.style.display = "none";
+logo.style.width = "320px"; // Ancho del logo como porcentaje del ancho de la ventana
+logo.style.maxWidth = "200px"; // Ancho máximo absoluto para grandes pantallas
+logo.style.height = "auto"; // Altura automática para mantener la relación de aspecto
+document.body.appendChild(logoBackground);
 // Función para manejar el movimiento del mouse
 function onMouseMove(event) {
     // Convertir coordenadas del mouse a coordenadas normalizadas del dispositivo
@@ -663,9 +712,15 @@ function onMouseMove(event) {
         if (intersects.length > 0) {
             // Mostrar tooltip
             tooltip.style.display = "block";
-            tooltip.style.left = `${event.clientX + 10}px`;
-            tooltip.style.top = `${event.clientY + 10}px`;
-            tooltip.textContent = "Informaci\xf3n del modelo 3D de prueba v1"; // Cambia esto según tu necesidad
+            // Asignar atributos al img
+            img.src = "./assets/imagen_tooltip.png"; // Ruta de la imagen
+            img.alt = "Imagen tooltip"; // Texto alternativo
+            img.style.width = "100%"; // Hacer que la imagen ocupe el 100% del contenedor
+            img.style.height = "auto"; // Mantener la relación de aspecto
+            img.style.borderRadius = "5px";
+            // Puedes agregar otros atributos usando setAttribute
+            img.setAttribute("title", "imagen modelo tooltip");
+            p.textContent = "Modelo Digital para la gesti\xf3n urbana en la construcci\xf3n de ecosistemas digitales para ciudades inteligentes."; // Cambia esto según tu necesidad
         } else // Ocultar tooltip
         tooltip.style.display = "none";
     }
@@ -715,6 +770,7 @@ function animate() {
 loadScene().then(()=>{
     // Ocultar el spinner y el texto de carga una vez que todo se haya cargado
     document.getElementById("loader-container").style.display = "none";
+    logoBackground.style.display = "block";
     // Iniciar la animación
     animate();
 }).catch((error)=>{

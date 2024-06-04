@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Modelo 1</title>
+    <title>Three.js modelo 3D</title>
     <style>body {
   margin: 0;
+  font-family: Roboto, sans-serif;
   overflow: hidden;
 }
 
@@ -46,8 +48,15 @@
     transform: rotate(360deg);
   }
 }
+
+@media (width <= 500px) {
+  .div-tooltip {
+    width: 140px !important;
+  }
+}
 </style>
 </head>
+
 <body>
     <div id="loader-container">
         <div id="loading-text">Cargando Modelo...</div>
@@ -55,4 +64,5 @@
     </div>
     <script src="/index.4d6bcbeb.js" defer=""></script>
 </body>
+
 </html>
