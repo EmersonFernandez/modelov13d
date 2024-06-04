@@ -4,9 +4,6 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 
-
-
-
 // Configuración inicial de la escena, cámara y renderizador
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
@@ -51,7 +48,6 @@ scene.add(directionalLight);
 const textureLoader = new THREE.TextureLoader();
 // Añadir suelo
 const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
-// const sep = textureLoader.load('assets/sep.jpg'); // Ruta de la textura
 const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xe6e6e6 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2;
@@ -109,7 +105,6 @@ function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
-    console.log(camera.position);
 }
 
 // Iniciar la carga de la escena
